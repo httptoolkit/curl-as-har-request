@@ -3,13 +3,31 @@
 
 import { type ControlOperator, parse, type ParseEntry } from 'shell-quote';
 
-import { type Converter, type ImportRequest, type Parameter } from './entities.ts';
+export interface ConvertedRequest {
+  method: string;
+  url: string;
+  headers: Header[];
+  parameters: Parameter[];
+  authentication: { username: string, password?: string } | {};
+  body: Body;
+}
 
-export const id = 'curl';
-export const name = 'cURL';
-export const description = 'cURL command line tool';
+interface Header {
+  name: string;
+  value: string;
+}
 
-let requestCount = 1;
+interface Parameter {
+    name: string;
+    type?: 'file' | 'text';
+    value?: string;
+    fileName?: string;
+}
+
+type Body =
+    | {}
+    | { mimeType: string; text: string; }
+    | { mimeType: string; params: Parameter[]; };
 
 const SUPPORTED_ARGS = [
   'url',
@@ -37,7 +55,7 @@ type Pair = string | boolean;
 
 type PairsByName = Record<string, Pair[]>;
 
-const importCommand = (parseEntries: ParseEntry[]): ImportRequest => {
+const importCommand = (parseEntries: ParseEntry[]): ConvertedRequest => {
   // ~~~~~~~~~~~~~~~~~~~~~ //
   // Collect all the flags //
   // ~~~~~~~~~~~~~~~~~~~~~ //
@@ -98,8 +116,7 @@ const importCommand = (parseEntries: ParseEntry[]): ImportRequest => {
     const { searchParams, href, search } = new URL(urlValue);
     parameters = Array.from(searchParams.entries()).map(([name, value]) => ({
       name,
-      value,
-      disabled: false,
+      value
     }));
 
     url = href.replace(search, '').replace(/\/$/, '');
@@ -220,12 +237,7 @@ const importCommand = (parseEntries: ParseEntry[]): ImportRequest => {
     method = 'text' in body || 'params' in body ? 'POST' : 'GET';
   }
 
-  const count = requestCount++;
   return {
-    _id: `__REQ_${count}__`,
-    _type: 'request',
-    parentId: '__WORKSPACE_ID__',
-    name: url || `cURL Import ${count}`,
     parameters,
     url,
     method,
@@ -359,9 +371,7 @@ const getPairValue = <T extends string | boolean>(parisByName: PairsByName, defa
   return defaultValue;
 };
 
-export const convert: Converter = rawData => {
-  requestCount = 1;
-
+export const convert = (rawData: string) => {
   if (!rawData.match(/^\s*curl /)) {
     return null;
   }
@@ -418,7 +428,7 @@ export const convert: Converter = rawData => {
   // Push the last unfinished command
   commands.push(currentCommand);
 
-  const requests: ImportRequest[] = commands.filter(command => command[0] === 'curl').map(importCommand);
+  const requests: ConvertedRequest[] = commands.filter(command => command[0] === 'curl').map(importCommand);
 
   return requests;
 };

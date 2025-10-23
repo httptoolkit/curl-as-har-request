@@ -32,6 +32,7 @@
   },
   "devDependencies": {
     "@types/chai": "^5.2.3",
+    "@types/har-format": "^1.2.16",
     "@types/mocha": "^10.0.10",
     "@types/shell-quote": "^1.7.5",
     "chai": "^6.2.0",
