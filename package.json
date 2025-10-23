@@ -1,0 +1,43 @@
+{
+  "name": "curl-as-har-request",
+  "version": "0.0.0",
+  "description": "Turn a Curl command string into a HAR request object",
+  "keywords": [
+    "curl",
+    "har",
+    "http",
+    "convert"
+  ],
+  "homepage": "https://github.com/httptoolkit/curl-as-har-request#readme",
+  "bugs": {
+    "url": "https://github.com/httptoolkit/curl-as-har-request/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/httptoolkit/curl-as-har-request.git"
+  },
+  "license": "Apache-2.0",
+  "author": "Tim Perry <tim@httptoolkit.com>",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc -p .",
+    "test": "mocha -r tsx tests.ts"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "dependencies": {
+    "shell-quote": "^1.8.3"
+  },
+  "devDependencies": {
+    "@types/chai": "^5.2.3",
+    "@types/mocha": "^10.0.10",
+    "@types/shell-quote": "^1.7.5",
+    "chai": "^6.2.0",
+    "har-validator": "^5.1.5",
+    "mocha": "^11.7.4",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
+  }
+}
