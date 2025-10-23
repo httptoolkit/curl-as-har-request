@@ -26,6 +26,12 @@ export function parseCurlCommand(curlCommand: string): Har.Request[] {
             req.headers.push({ name: 'Content-Type', value: body.mimeType });
         }
 
+        if (req.authentication.username || req.authentication.password) {
+            // Convert to base64 in a browser-compatible way:
+            const encodedAuth = btoa(`${req.authentication!.username || ''}:${req.authentication!.password || ''}`);
+            req.headers.push({ name: 'Authorization', value: `Basic ${encodedAuth}` });
+        }
+
         return {
             method: req.method,
             url: req.url,

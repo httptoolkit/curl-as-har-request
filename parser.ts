@@ -8,7 +8,7 @@ export interface ConvertedRequest {
   url: string;
   headers: Header[];
   parameters: Parameter[];
-  authentication: { username: string, password?: string } | {};
+  authentication: { username?: string, password?: string };
   body: Body;
 }
 

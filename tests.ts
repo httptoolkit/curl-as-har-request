@@ -39,4 +39,24 @@ describe("Curl parsing", () => {
             headersSize: -1
         }]);
     });
-})
+
+    it("should be able to parse a request with basic auth", () => {
+        expect(
+            parseCurlCommand('curl -u user:pass http://example.com')
+        ).to.deep.equal([{
+            method: 'GET',
+            url: 'http://example.com',
+            httpVersion: 'HTTP/1.1',
+            cookies: [],
+            headers: [{
+                name: 'Authorization',
+                value: 'Basic dXNlcjpwYXNz'
+            }],
+            postData: undefined,
+            queryString: [],
+            headersSize: -1,
+            bodySize: -1
+        }]);
+    });
+
+});
