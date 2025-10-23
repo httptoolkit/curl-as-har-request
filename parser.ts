@@ -221,7 +221,7 @@ const importCommand = (parseEntries: ParseEntry[]): ConvertedRequest => {
   } else if (dataParameters.length !== 0) {
     body = {
       text: dataParameters.map(parameter => `${parameter.name}${parameter.value}`).join('&'),
-      mimeType: mimeType || '',
+      mimeType: mimeType || 'application/x-www-form-urlencoded',
     };
   } else if (formDataParams.length) {
     body = {
