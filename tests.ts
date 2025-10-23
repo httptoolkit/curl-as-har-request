@@ -10,7 +10,10 @@ describe("Curl parsing", () => {
             url: 'http://example.com',
             httpVersion: 'HTTP/1.1',
             cookies: [],
-            headers: [],
+            headers: [{
+                name: 'Host',
+                value: 'example.com'
+            }],
             postData: undefined,
             queryString: [],
             headersSize: -1,
@@ -27,6 +30,9 @@ describe("Curl parsing", () => {
             httpVersion: 'HTTP/1.1',
             cookies: [],
             headers: [{
+                name: 'Host',
+                value: 'example.com'
+            }, {
                 name: 'Content-Type',
                 value: 'application/x-www-form-urlencoded'
             }],
@@ -49,6 +55,9 @@ describe("Curl parsing", () => {
             httpVersion: 'HTTP/1.1',
             cookies: [],
             headers: [{
+                name: 'Host',
+                value: 'example.com'
+            }, {
                 name: 'Authorization',
                 value: 'Basic dXNlcjpwYXNz'
             }],

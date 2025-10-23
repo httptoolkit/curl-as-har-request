@@ -17,13 +17,18 @@ export function parseCurlCommand(curlCommand: string): Har.Request[] {
     }
 
     return parserResult.map((req): Har.Request => {
+        const parsedUrl = new URL(req.url);
+
         const body = Object.keys(req.body).length === 0
             ? undefined
             : req.body as Har.PostData;
 
-
-        if (body?.mimeType && !req.headers.find(h => h.name.toLowerCase() === 'content-type')) {
+        if (!req.headers.find(h => h.name.toLowerCase() === 'content-type') && body?.mimeType) {
             req.headers.push({ name: 'Content-Type', value: body.mimeType });
+        }
+
+        if (!req.headers.find(h => h.name.toLowerCase() === 'host')) {
+            req.headers.unshift({ name: 'Host', value: parsedUrl.host });
         }
 
         if (req.authentication.username || req.authentication.password) {
