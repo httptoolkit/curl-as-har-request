@@ -20,7 +20,6 @@ export function parseCurlCommand(curlCommand: string): Har.Request[] {
         const parsedUrl = new URL(req.url);
 
         if (req.parameters.length) {
-            parsedUrl.pathname ||= '/';
             parsedUrl.search = req.parameters
                 .map(param => `${encodeURIComponent(param.name)}=${encodeURIComponent(param.value || '')}`)
                 .join('&');
