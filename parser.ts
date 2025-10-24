@@ -187,6 +187,7 @@ const importCommand = (parseEntries: ParseEntry[]): ConvertedRequest => {
   const jsonBody = pairsByName['json'];
   if (jsonBody) {
     mimeType ||= 'application/json';
+    headers.push({ name: 'Accept', value: 'application/json' });
     dataParameters.push({ name: '', value: jsonBody.join('') });
   }
 

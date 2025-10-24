@@ -13,6 +13,9 @@ describe("Curl parsing", () => {
             headers: [{
                 name: 'Host',
                 value: 'example.com'
+            }, {
+                name: 'Accept',
+                'value': '*/*'
             }],
             postData: undefined,
             queryString: [],
@@ -32,6 +35,9 @@ describe("Curl parsing", () => {
             headers: [{
                 name: 'Host',
                 value: 'example.com'
+            }, {
+                name: 'Accept',
+                'value': '*/*'
             }, {
                 name: 'Content-Type',
                 value: 'application/x-www-form-urlencoded'
@@ -58,6 +64,9 @@ describe("Curl parsing", () => {
                 name: 'Host',
                 value: 'example.com'
             }, {
+                name: 'Accept',
+                'value': '*/*'
+            }, {
                 name: 'Authorization',
                 value: 'Basic dXNlcjpwYXNz'
             }],
@@ -78,6 +87,9 @@ describe("Curl parsing", () => {
             headers: [{
                 name: 'Host',
                 value: 'example.com'
+            }, {
+                name: 'Accept',
+                'value': '*/*'
             }],
             postData: undefined,
             cookies: [],
@@ -98,6 +110,9 @@ describe("Curl parsing", () => {
             headers: [{
                 name: 'Host',
                 value: 'example.com'
+            }, {
+                name: 'Accept',
+                'value': '*/*'
             }, {
                 name: 'Content-Type',
                 value: 'application/json'
@@ -123,6 +138,9 @@ describe("Curl parsing", () => {
             headers: [{
                 name: 'Host',
                 value: 'example.com'
+            }, {
+                name: 'Accept',
+                value: 'application/json'
             }, {
                 name: 'Content-Type',
                 value: 'application/json'

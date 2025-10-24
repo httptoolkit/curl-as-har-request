@@ -34,6 +34,10 @@ export function parseCurlCommand(curlCommand: string): Har.Request[] {
             req.headers.push({ name: 'Content-Type', value: body.mimeType });
         }
 
+        if (!req.headers.find(h => h.name.toLowerCase() === 'accept')) {
+            req.headers.unshift({ name: 'Accept', value: '*/*' });
+        }
+
         if (!req.headers.find(h => h.name.toLowerCase() === 'host')) {
             req.headers.unshift({ name: 'Host', value: parsedUrl.host });
         }
