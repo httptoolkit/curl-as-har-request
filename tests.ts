@@ -27,6 +27,25 @@ describe("Curl parsing", () => {
             ...FIXED_VALUES
         }]);
     });
+    
+    it("should be able to parse a minimal request with no protocol", () => {
+        expect(
+            parseCurlCommand('curl example.com')
+        ).to.deep.equal([{
+            method: 'GET',
+            url: 'http://example.com',
+            httpVersion: 'HTTP/1.1',
+            headers: [{
+                name: 'Host',
+                value: 'example.com'
+            }, {
+                name: 'Accept',
+                'value': '*/*'
+            }],
+            postData: undefined,
+            ...FIXED_VALUES
+        }]);
+    });
 
     describe("with a body", () => {
         it("should be able to parse a POST request with urlencoded form data", () => {

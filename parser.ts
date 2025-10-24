@@ -121,7 +121,12 @@ const importCommand = (parseEntries: ParseEntry[]): ConvertedRequest => {
   let url = '';
 
   try {
-    const urlValue = getPairValue(pairsByName, (singletons[0] as string) || '', ['url']);
+    let urlValue = getPairValue(pairsByName, (singletons[0] as string) || '', ['url']);
+
+    if (urlValue && !urlValue.startsWith('http')) {
+      urlValue = 'http://' + urlValue;
+    }
+
     const { searchParams, href, search } = new URL(urlValue);
     parameters = Array.from(searchParams.entries()).map(([name, value]) => ({
       name,
