@@ -28,30 +28,134 @@ describe("Curl parsing", () => {
         }]);
     });
 
-    it("should be able to parse a POST request", () => {
-        expect(
-            parseCurlCommand('curl -X POST -d "hello world" http://example.com')
-        ).to.deep.equal([{
-            method: 'POST',
-            url: 'http://example.com',
-            httpVersion: 'HTTP/1.1',
-            headers: [{
-                name: 'Host',
-                value: 'example.com'
-            }, {
-                name: 'Accept',
-                'value': '*/*'
-            }, {
-                name: 'Content-Type',
-                value: 'application/x-www-form-urlencoded'
-            }],
-            postData: {
-                mimeType: "application/x-www-form-urlencoded",
-                text: "hello world"
-            },
-            ...FIXED_VALUES
-        }]);
+    describe("with a body", () => {
+        it("should be able to parse a POST request with urlencoded form data", () => {
+            expect(
+                parseCurlCommand('curl -H "content-type: application/x-www-form-urlencoded" -d "hello=world" http://example.com')
+            ).to.deep.equal([{
+                method: 'POST',
+                url: 'http://example.com',
+                httpVersion: 'HTTP/1.1',
+                headers: [{
+                    name: 'Host',
+                    value: 'example.com'
+                }, {
+                    name: 'Accept',
+                    'value': '*/*'
+                }, {
+                    name: 'content-type',
+                    value: 'application/x-www-form-urlencoded'
+                }],
+                postData: {
+                    mimeType: "application/x-www-form-urlencoded",
+                    params: [{ name: 'hello', value: 'world' }]
+                },
+                ...FIXED_VALUES
+            }]);
+        });
+
+        it("should be able to parse a POST request with single-value urlencoded form data", () => {
+            expect(
+                parseCurlCommand('curl -d "hello" http://example.com')
+            ).to.deep.equal([{
+                method: 'POST',
+                url: 'http://example.com',
+                httpVersion: 'HTTP/1.1',
+                headers: [{
+                    name: 'Host',
+                    value: 'example.com'
+                }, {
+                    name: 'Accept',
+                    'value': '*/*'
+                }, {
+                    name: 'Content-Type',
+                    value: 'application/x-www-form-urlencoded'
+                }],
+                postData: {
+                    mimeType: "application/x-www-form-urlencoded",
+                    text: "hello"
+                },
+                ...FIXED_VALUES
+            }]);
+        });
+
+        it("should be able to parse a POST request with multipart form data", () => {
+            expect(
+                parseCurlCommand('curl -X POST --form "hello=world" http://example.com')
+            ).to.deep.equal([{
+                method: 'POST',
+                url: 'http://example.com',
+                httpVersion: 'HTTP/1.1',
+                headers: [{
+                    name: 'Host',
+                    value: 'example.com'
+                }, {
+                    name: 'Accept',
+                    'value': '*/*'
+                }, {
+                    name: 'Content-Type',
+                    value: 'multipart/form-data'
+                }],
+                postData: {
+                    mimeType: "multipart/form-data",
+                    params: [{ name: 'hello', value: 'world', type: 'text' }]
+                },
+                ...FIXED_VALUES
+            }]);
+        });
+
+        it("should be able to parse a JSON body request with -d", () => {
+            expect(
+                parseCurlCommand('curl -X POST -H "Content-Type: application/json" -d \'{"key":"value"}\' http://example.com')
+            ).to.deep.equal([{
+                method: 'POST',
+                url: 'http://example.com',
+                httpVersion: 'HTTP/1.1',
+                headers: [{
+                    name: 'Host',
+                    value: 'example.com'
+                }, {
+                    name: 'Accept',
+                    'value': '*/*'
+                }, {
+                    name: 'Content-Type',
+                    value: 'application/json'
+                }],
+                postData: {
+                    mimeType: "application/json",
+                    text: '{"key":"value"}'
+                },
+                ...FIXED_VALUES
+            }]);
+        });
+
+        it("should be able to parse a JSON body request with --json", () => {
+            expect(
+                parseCurlCommand('curl -X POST --json \'{"key":"value"}\' http://example.com')
+            ).to.deep.equal([{
+                method: 'POST',
+                url: 'http://example.com',
+                httpVersion: 'HTTP/1.1',
+                headers: [{
+                    name: 'Host',
+                    value: 'example.com'
+                }, {
+                    name: 'Accept',
+                    value: 'application/json'
+                }, {
+                    name: 'Content-Type',
+                    value: 'application/json'
+                }],
+                postData: {
+                    mimeType: "application/json",
+                    text: '{"key":"value"}'
+                },
+                ...FIXED_VALUES
+            }]);
+        });
     });
+
+
 
     it("should be able to parse a request with basic auth", () => {
         expect(
@@ -90,56 +194,6 @@ describe("Curl parsing", () => {
                 'value': '*/*'
             }],
             postData: undefined,
-            ...FIXED_VALUES
-        }]);
-    });
-
-    it("should be able to parse a JSON body request with -d", () => {
-        expect(
-            parseCurlCommand('curl -X POST -H "Content-Type: application/json" -d \'{"key":"value"}\' http://example.com')
-        ).to.deep.equal([{
-            method: 'POST',
-            url: 'http://example.com',
-            httpVersion: 'HTTP/1.1',
-            headers: [{
-                name: 'Host',
-                value: 'example.com'
-            }, {
-                name: 'Accept',
-                'value': '*/*'
-            }, {
-                name: 'Content-Type',
-                value: 'application/json'
-            }],
-            postData: {
-                mimeType: "application/json",
-                text: '{"key":"value"}'
-            },
-            ...FIXED_VALUES
-        }]);
-    });
-
-    it("should be able to parse a JSON body request with --json", () => {
-        expect(
-            parseCurlCommand('curl -X POST --json \'{"key":"value"}\' http://example.com')
-        ).to.deep.equal([{
-            method: 'POST',
-            url: 'http://example.com',
-            httpVersion: 'HTTP/1.1',
-            headers: [{
-                name: 'Host',
-                value: 'example.com'
-            }, {
-                name: 'Accept',
-                value: 'application/json'
-            }, {
-                name: 'Content-Type',
-                value: 'application/json'
-            }],
-            postData: {
-                mimeType: "application/json",
-                text: '{"key":"value"}'
-            },
             ...FIXED_VALUES
         }]);
     });
