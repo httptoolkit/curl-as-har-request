@@ -19,6 +19,14 @@ export function parseCurlCommand(curlCommand: string): Har.Request[] {
     return parserResult.map((req): Har.Request => {
         const parsedUrl = new URL(req.url);
 
+        if (req.parameters.length) {
+            parsedUrl.pathname ||= '/';
+            parsedUrl.search = req.parameters
+                .map(param => `${encodeURIComponent(param.name)}=${encodeURIComponent(param.value || '')}`)
+                .join('&');
+            req.url = parsedUrl.toString();
+        }
+
         const body = Object.keys(req.body).length === 0
             ? undefined
             : req.body as Har.PostData;

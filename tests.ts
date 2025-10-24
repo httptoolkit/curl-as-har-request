@@ -68,4 +68,23 @@ describe("Curl parsing", () => {
         }]);
     });
 
+    it("should be able to parse a request with -G URL params", () => {
+        expect(
+            parseCurlCommand('curl -G -d "param1=value1" -d "param2=value2" http://example.com/?a=1')
+        ).to.deep.equal([{
+            method: 'GET',
+            url: 'http://example.com/?a=1&param1=value1&param2=value2',
+            httpVersion: 'HTTP/1.1',
+            headers: [{
+                name: 'Host',
+                value: 'example.com'
+            }],
+            postData: undefined,
+            cookies: [],
+            queryString: [],
+            headersSize: -1,
+            bodySize: -1
+        }]);
+    });
+
 });
