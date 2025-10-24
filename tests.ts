@@ -155,8 +155,6 @@ describe("Curl parsing", () => {
         });
     });
 
-
-
     it("should be able to parse a request with basic auth", () => {
         expect(
             parseCurlCommand('curl -u user:pass http://example.com')
@@ -220,6 +218,28 @@ describe("Curl parsing", () => {
             }, {
                 name: 'Accept',
                 'value': '*/*'
+            }],
+            postData: undefined,
+            ...FIXED_VALUES
+        }]);
+    });
+
+    it("should detect compressed command line flags", () => {
+        expect(
+            parseCurlCommand('curl --compressed http://example.com')
+        ).to.deep.equal([{
+            method: 'GET',
+            url: 'http://example.com',
+            httpVersion: 'HTTP/1.1',
+            headers: [{
+                name: 'Host',
+                value: 'example.com'
+            }, {
+                name: 'Accept',
+                'value': '*/*'
+            }, {
+                name: 'Accept-Encoding',
+                value: 'deflate, gzip, br, zstd'
             }],
             postData: undefined,
             ...FIXED_VALUES

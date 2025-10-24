@@ -51,11 +51,13 @@ const SUPPORTED_ARGS = [
   'request',
   'json',
   'X',
-  'http2'
+  'http2',
+  'compressed'
 ];
 
 const FLAG_ONLY_ARGS = [
-  'http2'
+  'http2',
+  'compressed'
 ];
 
 type Pair = string | boolean;
@@ -157,6 +159,13 @@ const importCommand = (parseEntries: ParseEntry[]): ConvertedRequest => {
       value: value.trim(),
     };
   });
+
+  if (pairsByName['compressed']) {
+    headers.push({
+      name: 'Accept-Encoding',
+      value: 'deflate, gzip, br, zstd',
+    });
+  }
 
   /// /////// Cookies //////////
   const cookieHeaderValue = [
