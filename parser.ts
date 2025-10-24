@@ -10,6 +10,7 @@ export interface ConvertedRequest {
   parameters: Parameter[];
   authentication: { username?: string, password?: string };
   body: Body;
+  httpVersion: 'HTTP/1.1' | 'HTTP/2';
 }
 
 interface Header {
@@ -50,6 +51,11 @@ const SUPPORTED_ARGS = [
   'request',
   'json',
   'X',
+  'http2'
+];
+
+const FLAG_ONLY_ARGS = [
+  'http2'
 ];
 
 type Pair = string | boolean;
@@ -86,7 +92,7 @@ const importCommand = (parseEntries: ParseEntry[]): ConvertedRequest => {
         // Handle squished arguments like -XPOST
         value = name.slice(1);
         name = name.slice(0, 1);
-      } else if (typeof nextEntry === 'string' && !nextEntry.startsWith('-')) {
+      } else if (typeof nextEntry === 'string' && !nextEntry.startsWith('-') && !FLAG_ONLY_ARGS.includes(name)) {
         // Next arg is not a flag, so assign it as the value
         value = nextEntry;
         i++; // Skip next one
@@ -239,6 +245,8 @@ const importCommand = (parseEntries: ParseEntry[]): ConvertedRequest => {
     };
   }
 
+  const httpVersion = pairsByName['http2'] ? 'HTTP/2' : 'HTTP/1.1';
+
   /// /////// Method //////////
   let method = getPairValue(pairsByName, '__UNSET__', ['X', 'request']).toUpperCase();
 
@@ -250,6 +258,7 @@ const importCommand = (parseEntries: ParseEntry[]): ConvertedRequest => {
     parameters,
     url,
     method,
+    httpVersion,
     headers,
     authentication,
     body,

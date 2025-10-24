@@ -38,8 +38,18 @@ export function parseCurlCommand(curlCommand: string): Har.Request[] {
             req.headers.unshift({ name: 'Accept', value: '*/*' });
         }
 
-        if (!req.headers.find(h => h.name.toLowerCase() === 'host')) {
-            req.headers.unshift({ name: 'Host', value: parsedUrl.host });
+        if (req.httpVersion === 'HTTP/1.1') {
+            if (!req.headers.find(h => h.name.toLowerCase() === 'host')) {
+                req.headers.unshift({ name: 'Host', value: parsedUrl.host });
+            }
+        } else {
+            const host = req.headers.find(h => h.name.toLowerCase() === 'host')?.value
+                || parsedUrl.host;
+
+            req.headers.unshift({ name: ':path', value: parsedUrl.pathname + parsedUrl.search });
+            req.headers.unshift({ name: ':authority', value: host });
+            req.headers.unshift({ name: ':scheme', value: parsedUrl.protocol.replace(/:$/, '') });
+            req.headers.unshift({ name: ':method', value: req.method });
         }
 
         if (req.authentication.username || req.authentication.password) {
@@ -51,7 +61,7 @@ export function parseCurlCommand(curlCommand: string): Har.Request[] {
         return {
             method: req.method,
             url: req.url,
-            httpVersion: 'HTTP/1.1',
+            httpVersion: req.httpVersion,
             headers: req.headers,
             postData: body,
             cookies: [],

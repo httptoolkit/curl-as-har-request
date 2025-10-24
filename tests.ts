@@ -155,4 +155,35 @@ describe("Curl parsing", () => {
         }]);
     });
 
+    it("should detect HTTP/2 command line flags", () => {
+        expect(
+            parseCurlCommand('curl --http2 https://example.com/?a=1')
+        ).to.deep.equal([{
+            method: 'GET',
+            url: 'https://example.com/?a=1',
+            httpVersion: 'HTTP/2',
+            cookies: [],
+            headers: [{
+                name: ':method',
+                value: 'GET'
+            }, {
+                name: ':scheme',
+                value: 'https'
+            }, {
+                name: ':authority',
+                value: 'example.com'
+            }, {
+                name: ':path',
+                value: '/?a=1'
+            }, {
+                name: 'Accept',
+                'value': '*/*'
+            }],
+            postData: undefined,
+            queryString: [],
+            headersSize: -1,
+            bodySize: -1
+        }]);
+    })
+
 });
