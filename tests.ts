@@ -1,6 +1,13 @@
 import { expect } from 'chai';
 import { parseCurlCommand } from './index.js';
 
+const FIXED_VALUES = {
+    cookies: [],
+    queryString: [],
+    headersSize: -1,
+    bodySize: -1
+};
+
 describe("Curl parsing", () => {
     it("should be able to parse a minimal GET request", () => {
         expect(
@@ -9,7 +16,6 @@ describe("Curl parsing", () => {
             method: 'GET',
             url: 'http://example.com',
             httpVersion: 'HTTP/1.1',
-            cookies: [],
             headers: [{
                 name: 'Host',
                 value: 'example.com'
@@ -18,9 +24,7 @@ describe("Curl parsing", () => {
                 'value': '*/*'
             }],
             postData: undefined,
-            queryString: [],
-            headersSize: -1,
-            bodySize: -1
+            ...FIXED_VALUES
         }]);
     });
 
@@ -31,7 +35,6 @@ describe("Curl parsing", () => {
             method: 'POST',
             url: 'http://example.com',
             httpVersion: 'HTTP/1.1',
-            cookies: [],
             headers: [{
                 name: 'Host',
                 value: 'example.com'
@@ -42,13 +45,11 @@ describe("Curl parsing", () => {
                 name: 'Content-Type',
                 value: 'application/x-www-form-urlencoded'
             }],
-            queryString: [],
             postData: {
                 mimeType: "application/x-www-form-urlencoded",
                 text: "hello world"
             },
-            bodySize: -1,
-            headersSize: -1
+            ...FIXED_VALUES
         }]);
     });
 
@@ -59,7 +60,6 @@ describe("Curl parsing", () => {
             method: 'GET',
             url: 'http://example.com',
             httpVersion: 'HTTP/1.1',
-            cookies: [],
             headers: [{
                 name: 'Host',
                 value: 'example.com'
@@ -71,9 +71,7 @@ describe("Curl parsing", () => {
                 value: 'Basic dXNlcjpwYXNz'
             }],
             postData: undefined,
-            queryString: [],
-            headersSize: -1,
-            bodySize: -1
+            ...FIXED_VALUES
         }]);
     });
 
@@ -92,10 +90,7 @@ describe("Curl parsing", () => {
                 'value': '*/*'
             }],
             postData: undefined,
-            cookies: [],
-            queryString: [],
-            headersSize: -1,
-            bodySize: -1
+            ...FIXED_VALUES
         }]);
     });
 
@@ -106,7 +101,6 @@ describe("Curl parsing", () => {
             method: 'POST',
             url: 'http://example.com',
             httpVersion: 'HTTP/1.1',
-            cookies: [],
             headers: [{
                 name: 'Host',
                 value: 'example.com'
@@ -117,13 +111,11 @@ describe("Curl parsing", () => {
                 name: 'Content-Type',
                 value: 'application/json'
             }],
-            queryString: [],
             postData: {
                 mimeType: "application/json",
                 text: '{"key":"value"}'
             },
-            bodySize: -1,
-            headersSize: -1
+            ...FIXED_VALUES
         }]);
     });
 
@@ -134,7 +126,6 @@ describe("Curl parsing", () => {
             method: 'POST',
             url: 'http://example.com',
             httpVersion: 'HTTP/1.1',
-            cookies: [],
             headers: [{
                 name: 'Host',
                 value: 'example.com'
@@ -145,13 +136,11 @@ describe("Curl parsing", () => {
                 name: 'Content-Type',
                 value: 'application/json'
             }],
-            queryString: [],
             postData: {
                 mimeType: "application/json",
                 text: '{"key":"value"}'
             },
-            bodySize: -1,
-            headersSize: -1
+            ...FIXED_VALUES
         }]);
     });
 
@@ -162,7 +151,6 @@ describe("Curl parsing", () => {
             method: 'GET',
             url: 'https://example.com/?a=1',
             httpVersion: 'HTTP/2',
-            cookies: [],
             headers: [{
                 name: ':method',
                 value: 'GET'
@@ -180,10 +168,62 @@ describe("Curl parsing", () => {
                 'value': '*/*'
             }],
             postData: undefined,
-            queryString: [],
-            headersSize: -1,
-            bodySize: -1
+            ...FIXED_VALUES
         }]);
-    })
+    });
+
+    it("should support cookies in the request", () => {
+        expect(
+            parseCurlCommand('curl -b "sessionid=abc123; csrftoken=def456" http://example.com')
+        ).to.deep.equal([{
+            method: 'GET',
+            url: 'http://example.com',
+            httpVersion: 'HTTP/1.1',
+            headers: [{
+                name: 'Host',
+                value: 'example.com'
+            }, {
+                name: 'Accept',
+                'value': '*/*'
+            }, {
+                name: 'Cookie',
+                value: 'sessionid=abc123; csrftoken=def456'
+            }],
+            postData: undefined,
+            ...FIXED_VALUES
+        }]);
+    });
+
+    it("should handle multiple requests in one command", () => {
+        expect(
+            parseCurlCommand('curl http://testserver.com; curl http://example.org')
+        ).to.deep.equal([{
+            method: 'GET',
+            url: 'http://testserver.com',
+            httpVersion: 'HTTP/1.1',
+            headers: [{
+                name: 'Host',
+                value: 'testserver.com'
+            }, {
+                name: 'Accept',
+                'value': '*/*'
+            }],
+            postData: undefined,
+            ...FIXED_VALUES
+        }, {
+            method: 'GET',
+            url: 'http://example.org',
+            httpVersion: 'HTTP/1.1',
+            headers: [{
+                name: 'Host',
+                value: 'example.org'
+            }, {
+                name: 'Accept',
+                'value': '*/*'
+            }],
+            postData: undefined,
+            ...FIXED_VALUES
+        }]);
+    });
 
 });
