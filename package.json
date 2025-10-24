@@ -1,6 +1,6 @@
 {
   "name": "curl-as-har-request",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Turn a Curl command string into a HAR request object",
   "keywords": [
     "curl",
