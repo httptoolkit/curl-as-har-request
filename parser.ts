@@ -48,6 +48,7 @@ const SUPPORTED_ARGS = [
   'form',
   'F',
   'request',
+  'json',
   'X',
 ];
 
@@ -180,7 +181,14 @@ const importCommand = (parseEntries: ParseEntry[]): ConvertedRequest => {
   /// /////// Body (Text or Blob) //////////
   const dataParameters = pairsToDataParameters(pairsByName);
   const contentTypeHeader = headers.find(header => header.name.toLowerCase() === 'content-type');
-  const mimeType = contentTypeHeader ? contentTypeHeader.value.split(';')[0] : null;
+  let mimeType = contentTypeHeader ? contentTypeHeader.value.split(';')[0] : null;
+
+  /// /////// Body (JSON) //////////
+  const jsonBody = pairsByName['json'];
+  if (jsonBody) {
+    mimeType ||= 'application/json';
+    dataParameters.push({ name: '', value: jsonBody.join('') });
+  }
 
   /// /////// Body (Multipart Form Data) //////////
   const formDataParams = [

@@ -87,4 +87,54 @@ describe("Curl parsing", () => {
         }]);
     });
 
+    it("should be able to parse a JSON body request with -d", () => {
+        expect(
+            parseCurlCommand('curl -X POST -H "Content-Type: application/json" -d \'{"key":"value"}\' http://example.com')
+        ).to.deep.equal([{
+            method: 'POST',
+            url: 'http://example.com',
+            httpVersion: 'HTTP/1.1',
+            cookies: [],
+            headers: [{
+                name: 'Host',
+                value: 'example.com'
+            }, {
+                name: 'Content-Type',
+                value: 'application/json'
+            }],
+            queryString: [],
+            postData: {
+                mimeType: "application/json",
+                text: '{"key":"value"}'
+            },
+            bodySize: -1,
+            headersSize: -1
+        }]);
+    });
+
+    it("should be able to parse a JSON body request with --json", () => {
+        expect(
+            parseCurlCommand('curl -X POST --json \'{"key":"value"}\' http://example.com')
+        ).to.deep.equal([{
+            method: 'POST',
+            url: 'http://example.com',
+            httpVersion: 'HTTP/1.1',
+            cookies: [],
+            headers: [{
+                name: 'Host',
+                value: 'example.com'
+            }, {
+                name: 'Content-Type',
+                value: 'application/json'
+            }],
+            queryString: [],
+            postData: {
+                mimeType: "application/json",
+                text: '{"key":"value"}'
+            },
+            bodySize: -1,
+            headersSize: -1
+        }]);
+    });
+
 });
